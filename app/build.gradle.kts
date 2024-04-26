@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.amigoprod.chatmigo"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.amigoprod.chatmigo"
         minSdk = 31
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.5")
+
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.7.1")
     // OkHttp
