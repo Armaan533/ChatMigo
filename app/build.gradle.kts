@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -50,13 +51,21 @@ android {
 }
 
 dependencies {
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+
+    // Add the dependency for the Firebase Authentication library
+    implementation("com.google.firebase:firebase-auth")
+
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.7.1")
+
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+
     // JSON Converter
     implementation("com.squareup.retrofit2:converter-gson:2.7.1")
 
