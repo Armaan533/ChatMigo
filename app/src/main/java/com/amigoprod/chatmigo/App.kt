@@ -1,5 +1,6 @@
 package com.amigoprod.chatmigo
 
+import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,14 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHost
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.pages.MenuPage
 import com.amigoprod.chatmigo.pages.StartupPage
-import java.util.logging.Handler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -51,17 +52,24 @@ fun App() {
     ) {paddingVal ->
         NavHost(
             navController = navController,
-            startDestination = Routes.StartupPage.route,
+            startDestination = Page.StartUp.route,
             modifier = Modifier.padding(paddingVal)
         ) {
-            composable(Routes.StartupPage.route){
+            composable(Page.StartUp.route){
                 StartupPage()
-                android.os.Handler(Looper.getMainLooper()).postDelayed(
-                    {navController.navigate(Routes.MenuPage.route)},
-                    500
+                Handler(Looper.getMainLooper()).postDelayed(
+                    {
+                        navController.navigate(Page.Menu.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = false
+                                inclusive = true
+                            }
+                        }
+                    },
+                    2000
                 )
             }
-            composable(Routes.MenuPage.route){
+            composable(Page.Menu.route){
                 MenuPage()
             }
         }
