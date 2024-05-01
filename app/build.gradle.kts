@@ -51,6 +51,9 @@ android {
 }
 
 dependencies {
+    // SplashScreen
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
 
