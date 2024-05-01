@@ -52,23 +52,23 @@ fun App() {
     ) {paddingVal ->
         NavHost(
             navController = navController,
-            startDestination = Page.StartUp.route,
+            startDestination = Page.Menu.route,
             modifier = Modifier.padding(paddingVal)
         ) {
-            composable(Page.StartUp.route){
-                StartupPage()
-                Handler(Looper.getMainLooper()).postDelayed(
-                    {
-                        navController.navigate(Page.Menu.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = false
-                                inclusive = true
-                            }
-                        }
-                    },
-                    2000
-                )
-            }
+//            composable(Page.StartUp.route){
+//                StartupPage()
+//                Handler(Looper.getMainLooper()).postDelayed(
+//                    {
+//                        navController.navigate(Page.Menu.route) {
+//                            popUpTo(navController.graph.findStartDestination().id) {
+//                                saveState = false
+//                                inclusive = true
+//                            }
+//                        }
+//                    },
+//                    2000
+//                )
+//            }
             composable(Page.Menu.route){
                 MenuPage()
             }
