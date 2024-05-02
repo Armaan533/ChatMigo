@@ -24,6 +24,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.pages.MenuPage
+import com.amigoprod.chatmigo.pages.SignUp
 import com.amigoprod.chatmigo.pages.StartupPage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +57,10 @@ fun App() {
             modifier = Modifier.padding(paddingVal)
         ) {
             composable(Page.Menu.route){
-                MenuPage()
+                MenuPage(navController)
+            }
+            composable(Page.Signup.route) {
+                SignUp()
             }
         }
     }

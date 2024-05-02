@@ -30,7 +30,7 @@ data class Chat(
 
 data class User(
     val uid: String,
-    val username: String? = null,
+    val name: String? = null,
     val phone: String,
     val password: String? = null
 )

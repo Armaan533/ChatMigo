@@ -15,6 +15,7 @@ import java.util.Collections.emptyList
 private object Routes {
 //    const val STARTUP_PAGE = "startup"
     const val MENU_PAGE = "menu"
+    const val SIGNUP_PAGE = "signup"
     const val CHAT_PAGE = "chat/{${ArgParams.CHAT_ID}}"
 }
 
@@ -31,6 +32,7 @@ sealed class Page(
 ) {
 //    object StartUp: Page(Routes.STARTUP_PAGE)
     object Menu: Page(Routes.MENU_PAGE)
+    object Signup: Page(Routes.SIGNUP_PAGE)
     object Chat: Page(
         Routes.CHAT_PAGE,
         navArguments = listOf(navArgument(ArgParams.CHAT_ID) {
