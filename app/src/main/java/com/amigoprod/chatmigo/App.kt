@@ -9,7 +9,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -25,10 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.amigoprod.chatmigo.customAppBars.MenuPageBarFunc
+import com.amigoprod.chatmigo.navigation.AppBarState
 import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.pages.MenuPage
 import com.amigoprod.chatmigo.pages.SignUp
@@ -37,36 +39,43 @@ import com.amigoprod.chatmigo.pages.SignUp
 @Preview
 @Composable
 fun App() {
-    val selectedRoute = remember {
-        mutableStateOf("start")
-    }
+
     val snackBarHostState = remember {
         SnackbarHostState()
     }
-    val topBarState = rememberSaveable {
-        (mutableStateOf(true))
-    }
+
     val density = LocalDensity.current
 
     val navController = rememberNavController()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
-    when (currentBackStackEntry?.destination?.route) {
-        Page.Signup.route -> {
-            topBarState.value = false
-        }
-        Page.Menu.route -> {
-            topBarState.value = true
-        }
-        Page.Chat.route -> {
-            topBarState.value = false
-        }
-    }
+    val appBarState = AppBarState(navController)
+
+
+//    val selectedRoute = remember {
+//        mutableStateOf("start")
+//    }
+//    val topBarState = rememberSaveable {
+//        (mutableStateOf(true))
+//    }
+//    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+//    when (currentBackStackEntry?.destination?.route) {
+//        Page.Signup.route -> {
+//            topBarState.value = false
+//        }
+//        Page.Menu.route -> {
+//            topBarState.value = true
+//        }
+//        Page.Chat.route -> {
+//            topBarState.value = false
+//        }
+//    }
+
+
 
     Scaffold (
         topBar = {
             AnimatedVisibility(
-                visible = topBarState.value,
+                visible = appBarState.isVisible,
                 enter = slideInVertically{
                     with(density) { -40.dp.roundToPx() }
                 } + expandVertically(
@@ -76,12 +85,7 @@ fun App() {
                 ),
                 exit = slideOutVertically() + shrinkVertically() + fadeOut()
             ) {
-                TopAppBar(
-                    title = { Text(text = "ChatMigo", modifier = Modifier.padding(20.dp)) },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                )
+                appBarState.PageBar()
             }
         }
     ) {paddingVal ->

@@ -1,15 +1,13 @@
 package com.amigoprod.chatmigo.navigation
 
-import android.app.ActionBar
-import android.widget.ActionMenuView
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavController
 import androidx.navigation.NavType
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.amigoprod.chatmigo.customAppBars.MenuPageBarFunc
 import java.util.Collections.emptyList
 
 //data class NavPage(var name: String, var icon: ImageVector?, var route: String)
@@ -35,31 +33,22 @@ private object ArgParams {
 
 sealed class Page(
     val route: String,
-    val isAppBarVisible: Boolean,
-    val navigationIcon: ImageVector?,
-    val onNavigationIconClick: (() -> Unit)?,
-    val title: String,
-    val actions: (()-> Unit)?,
-    val navArguments: List<NamedNavArgument> = emptyList()
+    val isAppBarVisible: Boolean?,
+    val navArguments: List<NamedNavArgument> = emptyList(),
+    val pageBar: @Composable() () -> Unit
 ) {
 
 
     object Menu: Page(
         route = Routes.MENU_PAGE,
         isAppBarVisible = true,
-        navigationIcon = null,
-        onNavigationIconClick = null,
-        title = "",
-        actions = null
+        pageBar = { MenuPageBarFunc() }
     )
 
     object Signup: Page(
         route = Routes.SIGNUP_PAGE,
         isAppBarVisible = false,
-        navigationIcon = null,
-        onNavigationIconClick = null,
-        title = "",
-        actions = null
+        pageBar = {}
     )
 
 
@@ -69,11 +58,40 @@ sealed class Page(
             type = NavType.Companion.StringType
         }),
         isAppBarVisible = true,
-        navigationIcon = null,
-        onNavigationIconClick = null,
-        title = "",
-        actions = null
+        pageBar = {}
     ) {
         fun createRoute(chatID: String) = Routes.CHAT_PAGE.replace(ArgParams.toPath(ArgParams.CHAT_ID), chatID)
     }
+}
+
+
+fun getScreen(route: String?): Page? = Page::class.nestedClasses.map {
+        kClass -> kClass.objectInstance as Page
+}.firstOrNull { page -> page.route == route }
+
+
+class AppBarState(
+    val navController: NavController
+) {
+    private val currentPageRoute: String?
+        @Composable get() = navController
+            .currentBackStackEntryAsState()
+            .value?.destination?.route
+
+    val currentPage: Page?
+        @Composable get() = getScreen(currentPageRoute)
+
+    val isVisible: Boolean
+        @Composable get() = currentPage?.isAppBarVisible == true
+
+    val PageBar: @Composable() ()->Unit
+        @Composable get() = { currentPage?.pageBar?.let { it() } }
+
+}
+
+@Composable
+fun rememberAppBarState(
+    navController: NavController
+) = remember {
+    AppBarState(navController)
 }
