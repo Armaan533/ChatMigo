@@ -71,7 +71,7 @@ fun getScreen(route: String?): Page? = Page::class.nestedClasses.map {
 
 
 class AppBarState(
-    val navController: NavController
+    private val navController: NavController
 ) {
     private val currentPageRoute: String?
         @Composable get() = navController
