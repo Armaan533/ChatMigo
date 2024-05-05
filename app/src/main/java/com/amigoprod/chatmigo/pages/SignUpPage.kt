@@ -67,6 +67,7 @@ fun SignUp() {
         modifier = Modifier
             .fillMaxWidth()
     ) {
+        Spacer(modifier = Modifier.padding(30.dp))
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -103,9 +104,7 @@ fun SignUp() {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
                     phoneNumber.value = it
-                    if (phoneNumber.value.length == 10){
-                        buttonEnabler.value = true
-                    }
+                    buttonEnabler.value = phoneNumber.value.length == 10
                 },
                 placeholder = { Text(text = "Enter your phone number")  },
                 modifier = Modifier
@@ -218,12 +217,3 @@ fun SignUp() {
         }
     }
 }
-
-//@Preview()
-//@Composable
-//fun OtpComposable(
-//    pno: MutableState<String> = mutableStateOf("1234567890"),
-//    enabled: MutableState<Boolean> = mutableStateOf(false)
-//) {
-//
-//}

@@ -9,5 +9,5 @@ import androidx.navigation.NavController
 fun LoginPage(
     navController: NavController? = null
 ) {
-    
+
 }
