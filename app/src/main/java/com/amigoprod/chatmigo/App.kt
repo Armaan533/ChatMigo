@@ -1,5 +1,7 @@
 package com.amigoprod.chatmigo
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,22 +11,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.amigoprod.chatmigo.auth.AuthUIClient
+import com.amigoprod.chatmigo.auth.SignInViewModel
 import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
 import com.amigoprod.chatmigo.pages.MenuPage
 import com.amigoprod.chatmigo.pages.SignUp
+import com.google.firebase.auth.PhoneAuthProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun App() {
+fun App(
+    authUIClient: AuthUIClient,
+    applicationContext: Context
+) {
 
 //    val snackBarHostState = remember {
 //        SnackbarHostState()
@@ -57,10 +68,29 @@ fun App() {
             modifier = Modifier.padding(paddingVal)
         ) {
             composable(Page.Menu.route){
+                LaunchedEffect(Unit) {
+                    if (authUIClient.getSignedInUser() == null) navController.navigate(Page.Signup.route)
+                }
                 MenuPage(navController)
             }
             composable(Page.Signup.route) {
-                SignUp()
+                val viewModel = viewModel<SignInViewModel>()
+                val state = viewModel.state.collectAsStateWithLifecycle()
+                SignUp(
+                    state.value,
+                    onOtpGenClick = {phone, context ->
+                        authUIClient.sendVerificationCode(
+                            phone,
+                            context as Activity
+                        )
+                    },
+                    onVerificationClick = {otp, context->
+                        authUIClient.signInWithPhoneAuthCredentials(
+                            verificationCode = otp,
+                             context as Activity
+                        )
+                    }
+                )
             }
         }
     }

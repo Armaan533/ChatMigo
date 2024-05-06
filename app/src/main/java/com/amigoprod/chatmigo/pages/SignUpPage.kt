@@ -1,5 +1,6 @@
 package com.amigoprod.chatmigo.pages
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -34,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,12 +43,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.amigoprod.chatmigo.SignInState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(backgroundColor = 0xFFFFFF)
 @Composable
-fun SignUp() {
+fun SignUp(
+    state: SignInState,
+    onOtpGenClick: ((String, Context) -> Unit),
+    onVerificationClick: ((String, Context) -> Unit)
+) {
+    val context = LocalContext.current
     val name = remember {
         mutableStateOf("")
     }
@@ -122,6 +129,7 @@ fun SignUp() {
                 onClick = {
                     inputEnabler.value = false
                     buttonEnabler.value = false
+                    onOtpGenClick("+91${phoneNumber.value}", context)
                 },
                 enabled = buttonEnabler.value
             ) {
@@ -206,7 +214,7 @@ fun SignUp() {
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 Button(
                     onClick = {
-
+                              onVerificationClick(otp.value.text, context)
                     },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)

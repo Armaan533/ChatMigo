@@ -5,13 +5,6 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.sql.Timestamp
 
-//class Message(
-//    @SerializedName("id") @Expose var id: Long? = null,
-//    @SerializedName("content") @Expose var content: String? = null,
-//    @SerializedName("timestamp") @Expose var timestamp: Timestamp? = null,
-//    @SerializedName("delivered") @Expose var delivered: Boolean = false,
-//    @SerializedName("read") @Expose var read: Boolean = false
-//)
 
 data class Message(
     val mid: String,
@@ -32,7 +25,17 @@ data class User(
     val uid: String,
     val name: String? = null,
     val phone: String,
-    val password: String? = null
+//    val password: String? = null
+)
+
+data class SignInResult(
+    val data: User?,
+    val errorMsg: String?
+)
+
+data class SignInState(
+    val isSignInSuccessful: Boolean = false,
+    val signInError: String? = null
 )
 
 fun Message.isMine(user: User): Boolean {
