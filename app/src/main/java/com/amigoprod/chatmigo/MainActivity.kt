@@ -26,8 +26,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     App(
-                        authUIClient,
-                        applicationContext
+                        authUIClient
                     )
                 }
             }
