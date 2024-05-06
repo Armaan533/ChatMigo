@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.User
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException
@@ -30,21 +31,26 @@ class AuthUIClient {
         }
 
         override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
-            Log.d("auth", "Code sent")
+            Log.d("auth", "Code sent with verification ID: $p0")
             _verificationID = p0
         }
     }
 
     fun signInWithPhoneAuthCredentials(
+        name: String,
         verificationCode: String,
         context: Context
-    ) {
+    ): SignInResult {
         val credential = PhoneAuthProvider.getCredential(_verificationID, verificationCode)
-        auth.signInWithCredential(credential).addOnCompleteListener(context as Activity){task ->
+        var success = false
+        var error: Exception? = null
+        val user = auth.signInWithCredential(credential).addOnCompleteListener(context as Activity){task ->
             if (task.isSuccessful) {
+                success = true
                 Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
             } else {
                 if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                    error = task.exception
                     Toast.makeText(
                         context,
                         "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,
@@ -52,7 +58,24 @@ class AuthUIClient {
                     ).show()
                 }
             }
-        }
+        }.result.user
+        if (success) return SignInResult(
+            data = user?.run {
+                phoneNumber?.let {
+                    User(
+                        uid = uid,
+                        name = name,
+                        phone = it
+                    )
+                }
+            },
+            errorMsg = null
+        )
+        else
+            return SignInResult(
+                data = null,
+                errorMsg = error?.message
+            )
     }
 
     fun sendVerificationCode(
@@ -81,6 +104,7 @@ class AuthUIClient {
     fun signOut() {
         try {
             auth.signOut()
+            Log.d("user", "Signed out...")
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e

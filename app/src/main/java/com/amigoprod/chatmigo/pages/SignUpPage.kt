@@ -41,17 +41,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.amigoprod.chatmigo.SignInState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp(
-    state: SignInState,
+//    state: SignInState,
     onOtpGenClick: ((String, Context) -> Unit),
-    onVerificationClick: ((String, Context) -> Unit)
+    onVerificationClick: ((String, Context, String) -> Unit)
 ) {
     val context = LocalContext.current
     val name = remember {
@@ -155,7 +153,7 @@ fun SignUp(
                 shape = CardDefaults.outlinedShape
             ) {
                 Text(
-                    text = "OTP sent to +91 ${phoneNumber.value}.",
+                    text = "OTP sent to +91${phoneNumber.value}.",
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 30.dp),
@@ -177,7 +175,7 @@ fun SignUp(
                 BasicTextField(
                     value = otp.value,
                     onValueChange = {
-                        if (it.text.length <=4) otp.value = it
+                        if (it.text.length <=6) otp.value = it
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     modifier = Modifier
@@ -187,7 +185,7 @@ fun SignUp(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        repeat(4) { index ->
+                        repeat(6) { index ->
                             val number = when {
                                 index >= otp.value.text.length -> ""
                                 else -> otp.value.text[index]
@@ -214,10 +212,11 @@ fun SignUp(
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 Button(
                     onClick = {
-                              onVerificationClick(otp.value.text, context)
+                              onVerificationClick(otp.value.text, context, name.value)
                     },
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
+                        .align(Alignment.CenterHorizontally),
+                    enabled = otp.value.text.length == 6
                 ) {
                     Text(text = "Verify OTP")
                 }
