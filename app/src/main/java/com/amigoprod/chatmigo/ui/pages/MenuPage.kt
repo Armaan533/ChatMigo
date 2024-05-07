@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.pages
+package com.amigoprod.chatmigo.ui.pages
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column

@@ -21,11 +21,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.amigoprod.chatmigo.auth.AuthUIClient
-import com.amigoprod.chatmigo.auth.SignInViewModel
+import com.amigoprod.chatmigo.ui.models.SignInViewModel
 import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
-import com.amigoprod.chatmigo.pages.MenuPage
-import com.amigoprod.chatmigo.pages.SignUp
+import com.amigoprod.chatmigo.ui.pages.MenuPage
+import com.amigoprod.chatmigo.ui.pages.SignUp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
@@ -42,8 +42,8 @@ fun App(
 
     val appBarState = rememberAppBarState(navController = navController)
 
-    val viewModel = viewModel<SignInViewModel>()
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val signInViewModel = viewModel<SignInViewModel>()
+    val state = signInViewModel.state.collectAsStateWithLifecycle()
 
     Scaffold (
         topBar = {
@@ -67,30 +67,28 @@ fun App(
         ) {
             composable(Page.Menu.route){
                 LaunchedEffect(Unit) {
-                    if (authUIClient.getSignedInUser() == null) {
+                    val user = authUIClient.getSignedInUser()
+                    if (user == null) {
                         navController.navigate(Page.Signup.route)
                     }
-                    val user = authUIClient.getSignedInUser()
-                    viewModel.onSignInResult(
-                        SignInResult(
-                            data = user,
-                            errorMsg = null
+                    else {
+                        Log.d(
+                            "user",
+                            "User logged in with uid: ${user.uid} and phone: ${user.phone}"
                         )
-                    )
-                    Log.d("user", "User signed in with uid: ${user?.uid} and phone: ${user?.phone}")
+                    }
                 }
                 MenuPage(
                     navController,
                     state.value.isSignInSuccessful,
                     onSignOutClick = {
                         authUIClient.signOut()
-                        viewModel.resetState()
+                        signInViewModel.resetState()
                     }
                 )
             }
             composable(Page.Signup.route) {
                 SignUp(
-//                    state.value,
                     onOtpGenClick = {phone, context ->
                         authUIClient.sendVerificationCode(
                             phone,
@@ -98,7 +96,7 @@ fun App(
                         )
                     },
                     onVerificationClick = {otp, context, name->
-                        viewModel.onSignInResult(
+                        signInViewModel.onSignInResult(
                             authUIClient.signInWithPhoneAuthCredentials(
                                 verificationCode = otp,
                                 context = context as Activity,

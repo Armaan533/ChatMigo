@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.pages
+package com.amigoprod.chatmigo.ui.pages
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview

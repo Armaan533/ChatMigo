@@ -22,6 +22,7 @@ class AuthUIClient {
     private lateinit var _verificationID : String
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        val otp = false
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
             Log.d("auth", "Verification Completed with credential $p0")
         }

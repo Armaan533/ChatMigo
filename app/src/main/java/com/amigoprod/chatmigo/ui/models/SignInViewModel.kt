@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.auth
+package com.amigoprod.chatmigo.ui.models
 
 import androidx.lifecycle.ViewModel
 import com.amigoprod.chatmigo.SignInResult
