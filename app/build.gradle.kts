@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.play:integrity:1.3.0")
     // SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
 

@@ -76,6 +76,7 @@ fun App(
                             "user",
                             "User logged in with uid: ${user.uid} and phone: ${user.phone}"
                         )
+                        Log.d("signInState", "state: ${state.value.isSignInSuccessful}")
                     }
                 }
                 MenuPage(

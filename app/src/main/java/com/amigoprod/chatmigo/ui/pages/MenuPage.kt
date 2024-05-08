@@ -27,10 +27,10 @@ fun MenuPage(
             Text(text = "SignUp")
         }
         Spacer(modifier = Modifier.padding(10.dp))
-        AnimatedVisibility(visible = isSignedIn) {
-            Button(onClick = {onSignOutClick()}) {
-                Text(text = "Sign Out")
-            }
+//        AnimatedVisibility(visible = isSignedIn) {
+//        }
+        Button(onClick = {onSignOutClick()}) {
+            Text(text = "Sign Out")
         }
     }
 }
