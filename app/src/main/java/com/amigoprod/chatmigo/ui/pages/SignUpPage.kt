@@ -1,6 +1,7 @@
 package com.amigoprod.chatmigo.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -22,8 +23,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,7 +51,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SignUp(
 //    state: SignInState,
-    onOtpGenClick: ((String, Context) -> Unit),
+    onOtpGenClick: ((String, Context) -> Boolean),
     onVerificationClick: ((String, Context, String) -> Unit)
 ) {
     val context = LocalContext.current
@@ -67,10 +70,14 @@ fun SignUp(
     val otp = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
+    val isOtpSent = remember {
+        mutableStateOf(false)
+    }
     val density = LocalDensity.current
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.padding(30.dp))
         Card(
@@ -127,15 +134,32 @@ fun SignUp(
                 onClick = {
                     inputEnabler.value = false
                     buttonEnabler.value = false
-                    onOtpGenClick("+91${phoneNumber.value}", context)
+                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
+                    Log.d("otpsent", "isOtpSent value : ${isOtpSent.value}")
                 },
-                enabled = buttonEnabler.value
+                enabled = buttonEnabler.value,
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = Color.Blue,
+                    contentColor = Color.Cyan
+                )
             ) {
-                Text(text = "Generate OTP")
+                if (inputEnabler.value)
+                    Text(text = "Generate OTP")
+                else if (!isOtpSent.value) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .fillMaxWidth(),
+                        strokeWidth = 3.dp
+                    )
+                    Text(text = "Generating OTP")
+                }
+                else
+                    Text(text = "OTP Generated!!")
             }
         }
         AnimatedVisibility(
-            visible = !inputEnabler.value,
+            visible = !inputEnabler.value && isOtpSent.value,
             enter = slideInVertically{
                 with(density) { -40.dp.roundToPx() }
             } + expandVertically(
@@ -145,6 +169,16 @@ fun SignUp(
             ),
             exit = slideOutVertically() + shrinkVertically() + fadeOut()
         ) {
+//            if (!isOtpSent.value) {
+//                Text(
+//                    text = "Generating Otp...",
+//                    modifier = Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .padding(5.dp)
+//                        .fillMaxWidth(),
+//                    textAlign = TextAlign.Center
+//                )
+//            }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

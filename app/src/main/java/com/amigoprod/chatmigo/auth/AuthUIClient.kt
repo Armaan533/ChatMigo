@@ -22,7 +22,7 @@ class AuthUIClient {
     private lateinit var _verificationID : String
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-        val otp = false
+        var isOtpSent = false
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
             Log.d("auth", "Verification Completed with credential $p0")
         }
@@ -34,6 +34,7 @@ class AuthUIClient {
         override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
             Log.d("auth", "Code sent with verification ID: $p0")
             _verificationID = p0
+            isOtpSent = true
         }
     }
 
@@ -82,7 +83,7 @@ class AuthUIClient {
     fun sendVerificationCode(
         number: String,
         activity: Activity
-    ) {
+    ): Boolean {
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(number)
             .setTimeout(60L, TimeUnit.SECONDS)
@@ -90,6 +91,7 @@ class AuthUIClient {
             .setCallbacks(callbacks)
             .build()
         PhoneAuthProvider.verifyPhoneNumber(options)
+        return callbacks.isOtpSent
     }
 
     fun getSignedInUser() : User? = auth.currentUser?.run {
