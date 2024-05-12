@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.User
 import com.google.firebase.Firebase
@@ -13,16 +15,28 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
 
-class AuthUIClient {
+class AuthUIClient(
+    private val savedStateHandle: SavedStateHandle
+): ViewModel() {
     private val auth = Firebase.auth
     private lateinit var _verificationID : String
+    private val _otpSent = MutableStateFlow(false)
+    var otpSent = _otpSent.asStateFlow()
+
+    val name = savedStateHandle.getStateFlow("name", "")
+    val phoneNumber = savedStateHandle.getStateFlow("phone", "")
+    val inputEnabler = savedStateHandle.getStateFlow("inputEna", true)
+    val buttonEnabler = savedStateHandle.getStateFlow("buttonEn", false)
+    val isOtpSent = savedStateHandle.getStateFlow("isOtpSent", false)
+
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-        var isOtpSent = false
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
             Log.d("auth", "Verification Completed with credential $p0")
         }
@@ -34,7 +48,7 @@ class AuthUIClient {
         override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
             Log.d("auth", "Code sent with verification ID: $p0")
             _verificationID = p0
-            isOtpSent = true
+            savedStateHandle["isOtpSent"] = true
         }
     }
 
@@ -83,7 +97,7 @@ class AuthUIClient {
     fun sendVerificationCode(
         number: String,
         activity: Activity
-    ): Boolean {
+    ) {
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(number)
             .setTimeout(60L, TimeUnit.SECONDS)
@@ -91,18 +105,17 @@ class AuthUIClient {
             .setCallbacks(callbacks)
             .build()
         PhoneAuthProvider.verifyPhoneNumber(options)
-        return callbacks.isOtpSent
     }
 
-    fun getSignedInUser() : User? = auth.currentUser?.run {
-        phoneNumber?.let {
-            User(
-                uid = uid,
-                name = displayName,
-                phone = it
-            )
-        }
-    }
+//    fun getSignedInUser() : User? = auth.currentUser?.run {
+//        phoneNumber?.let {
+//            User(
+//                uid = uid,
+//                name = displayName,
+//                phone = it
+//            )
+//        }
+//    }
 
     fun signOut() {
         try {

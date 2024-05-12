@@ -22,9 +22,9 @@ data class Chat(
 )
 
 data class User(
-    val uid: String,
+    val uid: String? = null,
     val name: String? = null,
-    val phone: String,
+    val phone: String? = null
 //    val password: String? = null
 )
 

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.amigoprod.chatmigo.auth.AuthUIClient
 import com.amigoprod.chatmigo.navigation.Page
 
 

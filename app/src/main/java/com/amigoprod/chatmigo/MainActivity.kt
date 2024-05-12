@@ -15,9 +15,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        val authUIClient by lazy {
-            AuthUIClient()
-        }
         setContent {
             ChatMigoTheme {
                 // A surface container using the 'background' color from the theme
@@ -25,9 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    App(
-                        authUIClient
-                    )
+                    App()
                 }
             }
         }

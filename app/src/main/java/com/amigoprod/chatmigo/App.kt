@@ -1,6 +1,5 @@
 package com.amigoprod.chatmigo
 
-import android.app.Activity
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -12,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -28,9 +28,7 @@ import com.amigoprod.chatmigo.ui.pages.MenuPage
 import com.amigoprod.chatmigo.ui.pages.SignUp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(
-    authUIClient: AuthUIClient,
-) {
+fun App() {
 
 //    val snackBarHostState = remember {
 //        SnackbarHostState()
@@ -42,8 +40,11 @@ fun App(
 
     val appBarState = rememberAppBarState(navController = navController)
 
+    val authUIClient = viewModel<AuthUIClient>()
+
     val signInViewModel = viewModel<SignInViewModel>()
-    val state = signInViewModel.state.collectAsStateWithLifecycle()
+    val user by signInViewModel.user.collectAsStateWithLifecycle()
+    val state by signInViewModel.state.collectAsStateWithLifecycle()
 
     Scaffold (
         topBar = {
@@ -67,8 +68,7 @@ fun App(
         ) {
             composable(Page.Menu.route){
                 LaunchedEffect(Unit) {
-                    val user = authUIClient.getSignedInUser()
-                    if (user == null) {
+                    if (user.uid == null) {
                         navController.navigate(Page.Signup.route)
                     }
                     else {
@@ -76,12 +76,12 @@ fun App(
                             "user",
                             "User logged in with uid: ${user.uid} and phone: ${user.phone}"
                         )
-                        Log.d("signInState", "state: ${state.value.isSignInSuccessful}")
+                        Log.d("signInState", "state: ${state.isSignInSuccessful}")
                     }
                 }
                 MenuPage(
                     navController,
-                    state.value.isSignInSuccessful,
+                    state.isSignInSuccessful,
                     onSignOutClick = {
                         authUIClient.signOut()
                         signInViewModel.resetState()
@@ -90,21 +90,12 @@ fun App(
             }
             composable(Page.Signup.route) {
                 SignUp(
-                    onOtpGenClick = {phone, context ->
-                        authUIClient.sendVerificationCode(
-                            phone,
-                            context as Activity
+                    onVerificationClick = {result ->
+                        signInViewModel.onSignInResult(
+                            result
                         )
                     },
-                    onVerificationClick = {otp, context, name->
-                        signInViewModel.onSignInResult(
-                            authUIClient.signInWithPhoneAuthCredentials(
-                                verificationCode = otp,
-                                context = context as Activity,
-                                name = name
-                            )
-                        )
-                    }
+                    authUIClient
                 )
             }
         }

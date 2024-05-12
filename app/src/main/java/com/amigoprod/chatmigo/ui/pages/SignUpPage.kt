@@ -1,5 +1,6 @@
 package com.amigoprod.chatmigo.ui.pages
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -45,14 +46,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.amigoprod.chatmigo.SignInResult
+import com.amigoprod.chatmigo.SignInState
+import com.amigoprod.chatmigo.auth.AuthUIClient
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp(
 //    state: SignInState,
-    onOtpGenClick: ((String, Context) -> Boolean),
-    onVerificationClick: ((String, Context, String) -> Unit)
+//    onOtpGenClick: ((String, Context) -> Boolean),
+    onVerificationClick: ((SignInResult) -> Unit),
+    authUIClient: AuthUIClient
 ) {
     val context = LocalContext.current
     val name = remember {
@@ -134,7 +139,11 @@ fun SignUp(
                 onClick = {
                     inputEnabler.value = false
                     buttonEnabler.value = false
-                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
+//                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
+                    authUIClient.sendVerificationCode(
+                        phoneNumber.value,
+                        context as Activity
+                    )
                     Log.d("otpsent", "isOtpSent value : ${isOtpSent.value}")
                 },
                 enabled = buttonEnabler.value,
@@ -246,8 +255,21 @@ fun SignUp(
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 Button(
                     onClick = {
-                              onVerificationClick(otp.value.text, context, name.value)
+                        onVerificationClick(
+                            authUIClient.signInWithPhoneAuthCredentials(
+                                verificationCode = otp.value.text,
+                                context = context as Activity,
+                                name = name.value
+                            )
+                        )
                     },
+//                              onVerificationClick(
+//                                      authUIClient.signInWithPhoneAuthCredentials(
+//                                          verificationCode = otp,
+//                                          context = context as Activity,
+//                                          name = name
+//                                      )
+//                              )
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
                     enabled = otp.value.text.length == 6
