@@ -33,6 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -65,22 +67,13 @@ fun SignUp(
         mutableStateOf(TextFieldValue(""))
     }
     val pageModel = viewModel<SignUpPageViewModel>()
-
-//    val name = remember {
-//        mutableStateOf("")
-//    }
-//    val phoneNumber = remember {
-//        mutableStateOf("")
-//    }
-//    val inputEnabler = remember {
-//        mutableStateOf(true)
-//    }
-//    val buttonEnabler = remember {
-//        mutableStateOf(false)
-//    }
-//    val isOtpSent = remember {
-//        mutableStateOf(false)
-//    }
+    val name by pageModel.name.collectAsState()
+    val phone = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    val inputEnabler by pageModel.inputEnabler.collectAsState()
+    val buttonEnabler by pageModel.buttonEnabler.collectAsState()
+    val isOtpSent by authUIClient.isOtpSent.collectAsState()
 
     Column(
         modifier = Modifier
@@ -103,7 +96,7 @@ fun SignUp(
                 fontFamily = FontFamily.Cursive
             )
             TextField(
-                value = pageModel.name,
+                value = name,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 onValueChange = {
                     pageModel.resetKey("name", it)
@@ -114,17 +107,18 @@ fun SignUp(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp),
                 singleLine = true,
-                enabled = pageModel.inputEnabler
+                enabled = inputEnabler
             )
 
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
 
             TextField(
-                value = pageModel.phoneNumber,
+                value = phone.value,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
-                    pageModel.resetKey("phone", it)
-                    pageModel.resetKey("buttonEn", pageModel.phoneNumber.length == 10)
+                    phone.value = it
+                    pageModel.resetKey("buttonEn", phone.value.text.length == 10)
+                    Log.d("phone", phone.value.text)
                 },
                 placeholder = { Text(text = "Enter your phone number")  },
                 modifier = Modifier
@@ -132,7 +126,7 @@ fun SignUp(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp),
                 singleLine = true,
-                enabled = pageModel.inputEnabler
+                enabled = inputEnabler
             )
 
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -143,21 +137,22 @@ fun SignUp(
                     pageModel.resetKey("inputEn", false)
                     pageModel.resetKey("buttonEn", false)
 //                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
+                    Log.d("phn", phone.value.text)
                     authUIClient.sendVerificationCode(
-                        pageModel.phoneNumber,
+                        "+91${phone.value.text}",
                         context as Activity
                     )
-                    Log.d("otpsent", "isOtpSent value : ${authUIClient.isOtpSent}")
+                    Log.d("otpsent", "isOtpSent value : ${authUIClient.isOtpSent.value}")
                 },
-                enabled = pageModel.buttonEnabler,
+                enabled = buttonEnabler,
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Blue,
                     contentColor = Color.Cyan
                 )
             ) {
-                if (pageModel.inputEnabler)
+                if (inputEnabler)
                     Text(text = "Generate OTP")
-                else if (!authUIClient.isOtpSent) {
+                else if (!isOtpSent) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .width(40.dp)
@@ -171,7 +166,7 @@ fun SignUp(
             }
         }
         AnimatedVisibility(
-            visible = !pageModel.inputEnabler && authUIClient.isOtpSent,
+            visible = !inputEnabler && isOtpSent,
             enter = slideInVertically{
                 with(density) { -40.dp.roundToPx() }
             } + expandVertically(
@@ -199,7 +194,7 @@ fun SignUp(
                 shape = CardDefaults.outlinedShape
             ) {
                 Text(
-                    text = "OTP sent to +91${pageModel.phoneNumber}.",
+                    text = "OTP sent to +91${phone.value.text}.",
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 30.dp),
@@ -262,7 +257,7 @@ fun SignUp(
                             authUIClient.signInWithPhoneAuthCredentials(
                                 verificationCode = otp.value.text,
                                 context = context as Activity,
-                                name = pageModel.name
+                                name = name
                             )
                         )
                     },

@@ -25,7 +25,7 @@ class AuthUIClient(
     private val auth = Firebase.auth
     private lateinit var _verificationID : String
 
-    val isOtpSent = savedStateHandle.getStateFlow("isOtpSent", false).value
+    val isOtpSent = savedStateHandle.getStateFlow("isOtpSent", false)
 
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
