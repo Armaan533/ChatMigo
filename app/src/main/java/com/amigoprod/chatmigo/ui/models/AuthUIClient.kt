@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.auth
+package com.amigoprod.chatmigo.ui.models
 
 import android.app.Activity
 import android.content.Context
@@ -15,8 +15,6 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
@@ -26,14 +24,8 @@ class AuthUIClient(
 ): ViewModel() {
     private val auth = Firebase.auth
     private lateinit var _verificationID : String
-    private val _otpSent = MutableStateFlow(false)
-    var otpSent = _otpSent.asStateFlow()
 
-    val name = savedStateHandle.getStateFlow("name", "")
-    val phoneNumber = savedStateHandle.getStateFlow("phone", "")
-    val inputEnabler = savedStateHandle.getStateFlow("inputEna", true)
-    val buttonEnabler = savedStateHandle.getStateFlow("buttonEn", false)
-    val isOtpSent = savedStateHandle.getStateFlow("isOtpSent", false)
+    val isOtpSent = savedStateHandle.getStateFlow("isOtpSent", false).value
 
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {

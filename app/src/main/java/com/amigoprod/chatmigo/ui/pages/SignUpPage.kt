@@ -1,7 +1,6 @@
 package com.amigoprod.chatmigo.ui.pages
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -12,6 +11,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +45,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amigoprod.chatmigo.SignInResult
-import com.amigoprod.chatmigo.SignInState
-import com.amigoprod.chatmigo.auth.AuthUIClient
+import com.amigoprod.chatmigo.ui.models.AuthUIClient
+import com.amigoprod.chatmigo.ui.models.SignUpPageViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,25 +60,28 @@ fun SignUp(
     authUIClient: AuthUIClient
 ) {
     val context = LocalContext.current
-    val name = remember {
-        mutableStateOf("")
-    }
-    val phoneNumber = remember {
-        mutableStateOf("")
-    }
-    val inputEnabler = remember {
-        mutableStateOf(true)
-    }
-    val buttonEnabler = remember {
-        mutableStateOf(false)
-    }
+    val density = LocalDensity.current
     val otp = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
-    val isOtpSent = remember {
-        mutableStateOf(false)
-    }
-    val density = LocalDensity.current
+    val pageModel = viewModel<SignUpPageViewModel>()
+
+//    val name = remember {
+//        mutableStateOf("")
+//    }
+//    val phoneNumber = remember {
+//        mutableStateOf("")
+//    }
+//    val inputEnabler = remember {
+//        mutableStateOf(true)
+//    }
+//    val buttonEnabler = remember {
+//        mutableStateOf(false)
+//    }
+//    val isOtpSent = remember {
+//        mutableStateOf(false)
+//    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -100,10 +103,10 @@ fun SignUp(
                 fontFamily = FontFamily.Cursive
             )
             TextField(
-                value = name.value,
+                value = pageModel.name,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 onValueChange = {
-                    name.value = it
+                    pageModel.resetKey("name", it)
                 },
                 placeholder = { Text(text = "Enter name")   },
                 modifier = Modifier
@@ -111,17 +114,17 @@ fun SignUp(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp),
                 singleLine = true,
-                enabled = inputEnabler.value
+                enabled = pageModel.inputEnabler
             )
 
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
 
             TextField(
-                value = phoneNumber.value,
+                value = pageModel.phoneNumber,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
-                    phoneNumber.value = it
-                    buttonEnabler.value = phoneNumber.value.length == 10
+                    pageModel.resetKey("phone", it)
+                    pageModel.resetKey("buttonEn", pageModel.phoneNumber.length == 10)
                 },
                 placeholder = { Text(text = "Enter your phone number")  },
                 modifier = Modifier
@@ -129,7 +132,7 @@ fun SignUp(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp),
                 singleLine = true,
-                enabled = inputEnabler.value
+                enabled = pageModel.inputEnabler
             )
 
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -137,24 +140,24 @@ fun SignUp(
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = {
-                    inputEnabler.value = false
-                    buttonEnabler.value = false
+                    pageModel.resetKey("inputEn", false)
+                    pageModel.resetKey("buttonEn", false)
 //                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
                     authUIClient.sendVerificationCode(
-                        phoneNumber.value,
+                        pageModel.phoneNumber,
                         context as Activity
                     )
-                    Log.d("otpsent", "isOtpSent value : ${isOtpSent.value}")
+                    Log.d("otpsent", "isOtpSent value : ${authUIClient.isOtpSent}")
                 },
-                enabled = buttonEnabler.value,
+                enabled = pageModel.buttonEnabler,
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Blue,
                     contentColor = Color.Cyan
                 )
             ) {
-                if (inputEnabler.value)
+                if (pageModel.inputEnabler)
                     Text(text = "Generate OTP")
-                else if (!isOtpSent.value) {
+                else if (!authUIClient.isOtpSent) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .width(40.dp)
@@ -168,7 +171,7 @@ fun SignUp(
             }
         }
         AnimatedVisibility(
-            visible = !inputEnabler.value && isOtpSent.value,
+            visible = !pageModel.inputEnabler && authUIClient.isOtpSent,
             enter = slideInVertically{
                 with(density) { -40.dp.roundToPx() }
             } + expandVertically(
@@ -196,7 +199,7 @@ fun SignUp(
                 shape = CardDefaults.outlinedShape
             ) {
                 Text(
-                    text = "OTP sent to +91${phoneNumber.value}.",
+                    text = "OTP sent to +91${pageModel.phoneNumber}.",
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 30.dp),
@@ -206,8 +209,8 @@ fun SignUp(
                     text = "Change number?",
                     modifier = Modifier
                         .clickable {
-                            inputEnabler.value = true
-                            buttonEnabler.value = true
+                            pageModel.resetKey("inputEn", true)
+                            pageModel.resetKey("buttonEn", true)
                         }
                         .align(Alignment.CenterHorizontally),
                     color = Color.Blue,
@@ -259,7 +262,7 @@ fun SignUp(
                             authUIClient.signInWithPhoneAuthCredentials(
                                 verificationCode = otp.value.text,
                                 context = context as Activity,
-                                name = name.value
+                                name = pageModel.name
                             )
                         )
                     },

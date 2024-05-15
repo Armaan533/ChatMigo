@@ -20,7 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.amigoprod.chatmigo.auth.AuthUIClient
+import com.amigoprod.chatmigo.ui.models.AuthUIClient
 import com.amigoprod.chatmigo.ui.models.SignInViewModel
 import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
