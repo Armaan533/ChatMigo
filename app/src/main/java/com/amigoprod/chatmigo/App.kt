@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +27,7 @@ import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
 import com.amigoprod.chatmigo.ui.pages.MenuPage
 import com.amigoprod.chatmigo.ui.pages.SignUp
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun App() {
 
@@ -59,14 +58,14 @@ fun App() {
     ) {paddingVal ->
         NavHost(
             navController = navController,
-            startDestination = Page.Menu.route,
+            startDestination = if(authUIClient.getSignedInUser() != null) Page.Menu.route else Page.Signup.route,
             modifier = Modifier.padding(paddingVal)
         ) {
             composable(Page.Menu.route){
                 val user = authUIClient.getSignedInUser()
                 LaunchedEffect(Unit) {
                     if (user == null) {
-                        navController.navigate(Page.Signup.route)
+//                        navController.navigate(Page.Signup.route)
                     }
                     else {
                         Log.d(
@@ -76,7 +75,6 @@ fun App() {
                     }
                 }
                 MenuPage(
-                    navController,
                     onSignOutClick = {
                         authUIClient.signOut()
                     }
