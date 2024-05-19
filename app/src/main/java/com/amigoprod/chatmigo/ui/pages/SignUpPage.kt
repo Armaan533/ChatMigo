@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.ui.models.AuthUIClient
 import com.amigoprod.chatmigo.ui.models.SignUpPageViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +65,7 @@ fun SignUp(
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
     val otp = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
@@ -253,13 +256,15 @@ fun SignUp(
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 Button(
                     onClick = {
-                        onVerificationClick(
-                            authUIClient.signInWithPhoneAuthCredentials(
+                        coroutineScope.launch {
+                            val result = authUIClient.signInWithPhoneAuthCredentials(
                                 verificationCode = otp.value.text,
-                                context = context as Activity,
                                 name = name
                             )
-                        )
+                            onVerificationClick(
+                                result
+                            )
+                        }
                     },
 //                              onVerificationClick(
 //                                      authUIClient.signInWithPhoneAuthCredentials(

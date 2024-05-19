@@ -16,7 +16,6 @@ import com.amigoprod.chatmigo.navigation.Page
 @Composable
 fun MenuPage(
     navController: NavController,
-    isSignedIn: Boolean,
     onSignOutClick: (() -> Unit)
 ) {
     Column {

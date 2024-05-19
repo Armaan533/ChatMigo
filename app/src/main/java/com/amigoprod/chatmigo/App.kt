@@ -1,6 +1,7 @@
 package com.amigoprod.chatmigo
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,11 +12,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,10 +32,6 @@ import com.amigoprod.chatmigo.ui.pages.SignUp
 @Composable
 fun App() {
 
-//    val snackBarHostState = remember {
-//        SnackbarHostState()
-//    }
-
     val density = LocalDensity.current
 
     val navController = rememberNavController()
@@ -42,9 +40,7 @@ fun App() {
 
     val authUIClient = viewModel<AuthUIClient>()
 
-    val signInViewModel = viewModel<SignInViewModel>()
-    val user by signInViewModel.user.collectAsStateWithLifecycle()
-    val state by signInViewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold (
         topBar = {
@@ -67,8 +63,9 @@ fun App() {
             modifier = Modifier.padding(paddingVal)
         ) {
             composable(Page.Menu.route){
+                val user = authUIClient.getSignedInUser()
                 LaunchedEffect(Unit) {
-                    if (user.uid == null) {
+                    if (user == null) {
                         navController.navigate(Page.Signup.route)
                     }
                     else {
@@ -76,21 +73,45 @@ fun App() {
                             "user",
                             "User logged in with uid: ${user.uid} and phone: ${user.phone}"
                         )
-                        Log.d("signInState", "state: ${state.isSignInSuccessful}")
                     }
                 }
                 MenuPage(
                     navController,
-                    state.isSignInSuccessful,
                     onSignOutClick = {
                         authUIClient.signOut()
-                        signInViewModel.resetState()
                     }
                 )
             }
             composable(Page.Signup.route) {
+                val signInViewModel = viewModel<SignInViewModel>()
+                val state by signInViewModel.state.collectAsState()
+
+
+                LaunchedEffect(key1 = state.isSignInSuccessful) {
+                    if (state.isSignInSuccessful) {
+                        Toast.makeText(
+                            context,
+                            "Signin successful",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        navController.navigate(Page.Menu.route)
+                        signInViewModel.resetState()
+                    }
+                }
+                LaunchedEffect(key1 = state.signInError) {
+                    state.signInError?.let {error ->
+                        Toast.makeText(
+                            context,
+                            error,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+
                 SignUp(
                     onVerificationClick = {result ->
+                        Log.d("verifyClick", "${result.data?.uid} ${result.data?.name} ${result.data?.phone}")
                         signInViewModel.onSignInResult(
                             result
                         )

@@ -1,20 +1,18 @@
 package com.amigoprod.chatmigo.ui.models
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.User
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
@@ -44,46 +42,47 @@ class AuthUIClient(
         }
     }
 
-    fun signInWithPhoneAuthCredentials(
+    suspend fun signInWithPhoneAuthCredentials(
         name: String,
-        verificationCode: String,
-        context: Context
+        verificationCode: String
     ): SignInResult {
         val credential = PhoneAuthProvider.getCredential(_verificationID, verificationCode)
-        var success = false
-        var error: Exception? = null
-        val user = auth.signInWithCredential(credential).addOnCompleteListener(context as Activity){task ->
-            if (task.isSuccessful) {
-                success = true
-                Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-            } else {
-                if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                    error = task.exception
-                    Toast.makeText(
-                        context,
-                        "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }.result.user
-        if (success) return SignInResult(
-            data = user?.run {
-                phoneNumber?.let {
+        return try {
+            val authResult = auth.signInWithCredential(credential).await()
+            SignInResult(
+                data = authResult.user?.run {
                     User(
                         uid = uid,
                         name = name,
-                        phone = it
+                        phone = phoneNumber
                     )
-                }
-            },
-            errorMsg = null
-        )
-        else
-            return SignInResult(
-                data = null,
-                errorMsg = error?.message
+                },
+                errorMsg = null
             )
+        } catch (e: Exception){
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+            SignInResult(
+                data = null,
+                errorMsg = e.message
+            )
+        }
+
+//        .addOnCompleteListener(context as Activity){task ->
+//            if (task.isSuccessful) {
+//                success = true
+//                Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
+//            } else {
+//                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+//                    error = task.exception
+//                    Toast.makeText(
+//                        context,
+//                        "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            }
+//        }
     }
 
     fun sendVerificationCode(
@@ -99,15 +98,15 @@ class AuthUIClient(
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-//    fun getSignedInUser() : User? = auth.currentUser?.run {
-//        phoneNumber?.let {
-//            User(
-//                uid = uid,
-//                name = displayName,
-//                phone = it
-//            )
-//        }
-//    }
+    fun getSignedInUser() : User? = auth.currentUser?.run {
+        phoneNumber?.let {
+            User(
+                uid = uid,
+                name = displayName,
+                phone = it
+            )
+        }
+    }
 
     fun signOut() {
         try {

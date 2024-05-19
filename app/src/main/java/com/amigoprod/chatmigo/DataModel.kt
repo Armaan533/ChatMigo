@@ -1,8 +1,7 @@
 package com.amigoprod.chatmigo
 
-import android.system.Int64Ref
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.sql.Timestamp
 
 
@@ -21,22 +20,24 @@ data class Chat(
     val members: List<User>? = emptyList()
 )
 
+@Parcelize
 data class User(
     val uid: String? = null,
     val name: String? = null,
     val phone: String? = null
 //    val password: String? = null
-)
+) : Parcelable
 
 data class SignInResult(
     val data: User?,
     val errorMsg: String?
 )
 
+@Parcelize
 data class SignInState(
     val isSignInSuccessful: Boolean = false,
     val signInError: String? = null
-)
+) : Parcelable
 
 fun Message.isMine(user: User): Boolean {
     return this.sender!!.uid == user.uid
