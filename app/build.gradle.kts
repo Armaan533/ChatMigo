@@ -52,6 +52,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
     implementation("com.google.android.play:integrity:1.3.0")
     // SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
