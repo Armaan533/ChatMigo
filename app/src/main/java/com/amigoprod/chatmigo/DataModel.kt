@@ -8,7 +8,7 @@ import java.sql.Timestamp
 data class Message(
     val mid: String,
     val content: String? = null,
-    val sender: User? = null,
+    val senderId: String? = null,
     val timestamp: Timestamp? = null,
     val delivered: Boolean = false,
     val read: Boolean = false
@@ -16,7 +16,7 @@ data class Message(
 
 data class Chat(
     val cid: String,
-    val messages: List<Message>? = emptyList(),
+    val lastMessage: Message?,
     val members: List<User>? = emptyList()
 )
 
@@ -40,5 +40,5 @@ data class SignInState(
 ) : Parcelable
 
 fun Message.isMine(user: User): Boolean {
-    return this.sender!!.uid == user.uid
+    return this.senderId == user.uid
 }

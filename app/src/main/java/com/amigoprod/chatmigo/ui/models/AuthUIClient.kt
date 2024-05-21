@@ -67,22 +67,6 @@ class AuthUIClient(
                 errorMsg = e.message
             )
         }
-
-//        .addOnCompleteListener(context as Activity){task ->
-//            if (task.isSuccessful) {
-//                success = true
-//                Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-//            } else {
-//                if (task.exception is FirebaseAuthInvalidCredentialsException) {
-//                    error = task.exception
-//                    Toast.makeText(
-//                        context,
-//                        "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
-//        }
     }
 
     fun sendVerificationCode(
