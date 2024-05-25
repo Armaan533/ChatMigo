@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 class SignUpPageViewModel(
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    val name = savedStateHandle.getStateFlow("name", "")
-//    val phoneNumber = savedStateHandle.getStateFlow("phone", "")
+    val name = savedStateHandle.getStateFlow("username", "")
 
     val inputEnabler = savedStateHandle.getStateFlow("inputEn", true)
     val buttonEnabler = savedStateHandle.getStateFlow("buttonEn", false)
+    val verifyButtonEn = savedStateHandle.getStateFlow("verifyEn", true)
 
     fun resetKey(key: String, value: String) {
         savedStateHandle[key] = value

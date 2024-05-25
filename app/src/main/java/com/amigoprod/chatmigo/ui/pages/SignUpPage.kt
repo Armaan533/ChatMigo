@@ -28,7 +28,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -55,11 +54,8 @@ import com.amigoprod.chatmigo.ui.models.SignUpPageViewModel
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp(
-//    state: SignInState,
-//    onOtpGenClick: ((String, Context) -> Boolean),
     onVerificationClick: ((SignInResult) -> Unit),
     authUIClient: AuthUIClient
 ) {
@@ -77,7 +73,7 @@ fun SignUp(
     val inputEnabler by pageModel.inputEnabler.collectAsState()
     val buttonEnabler by pageModel.buttonEnabler.collectAsState()
     val isOtpSent by authUIClient.isOtpSent.collectAsState()
-
+    val isVerifyClicked by pageModel.verifyButtonEn.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -168,6 +164,7 @@ fun SignUp(
                     Text(text = "OTP Generated!!")
             }
         }
+        Spacer(modifier = Modifier.padding(20.dp))
         AnimatedVisibility(
             visible = !inputEnabler && isOtpSent,
             enter = slideInVertically{
@@ -179,16 +176,6 @@ fun SignUp(
             ),
             exit = slideOutVertically() + shrinkVertically() + fadeOut()
         ) {
-//            if (!isOtpSent.value) {
-//                Text(
-//                    text = "Generating Otp...",
-//                    modifier = Modifier
-//                        .align(Alignment.CenterHorizontally)
-//                        .padding(5.dp)
-//                        .fillMaxWidth(),
-//                    textAlign = TextAlign.Center
-//                )
-//            }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -266,16 +253,9 @@ fun SignUp(
                             )
                         }
                     },
-//                              onVerificationClick(
-//                                      authUIClient.signInWithPhoneAuthCredentials(
-//                                          verificationCode = otp,
-//                                          context = context as Activity,
-//                                          name = name
-//                                      )
-//                              )
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
-                    enabled = otp.value.text.length == 6
+                    enabled = otp.value.text.length == 6 && isVerifyClicked
                 ) {
                     Text(text = "Verify OTP")
                 }
