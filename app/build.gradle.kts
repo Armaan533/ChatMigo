@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
     id("com.google.gms.google-services")
     id("kotlin-parcelize")
 }
@@ -52,6 +54,8 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
     implementation("com.google.android.play:integrity:1.3.0")
@@ -64,8 +68,11 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     implementation("com.google.firebase:firebase-auth")
 
+    // dependency for firebase realtime database
+    implementation("com.google.firebase:firebase-database")
+
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta01")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.7.1")

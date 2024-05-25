@@ -12,14 +12,17 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MenuPage(
-    onSignOutClick: (() -> Unit)
+    onSignOutClick: (() -> Unit),
+    onChatPageClick: (() -> Unit)
 ) {
     Column {
+        Button(onClick = { onChatPageClick() }) {
+            Text(text = "Chat Page")
+        }
         Spacer(modifier = Modifier.padding(10.dp))
 
         Button(onClick = {onSignOutClick()}) {
             Text(text = "Sign Out")
         }
-
     }
 }

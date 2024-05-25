@@ -21,10 +21,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.amigoprod.chatmigo.navigation.Pages
 import com.amigoprod.chatmigo.ui.models.AuthUIClient
 import com.amigoprod.chatmigo.ui.models.SignInViewModel
-import com.amigoprod.chatmigo.navigation.Page
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
+import com.amigoprod.chatmigo.ui.pages.ChatPage
 import com.amigoprod.chatmigo.ui.pages.MenuPage
 import com.amigoprod.chatmigo.ui.pages.SignUp
 
@@ -52,16 +53,16 @@ fun App() {
                 ),
                 exit = slideOutVertically()+ fadeOut()
             ) {
-                appBarState.PageBar()
+                appBarState.pageBar()
             }
         }
     ) {paddingVal ->
         NavHost(
             navController = navController,
-            startDestination = if(authUIClient.getSignedInUser() != null) Page.Menu.route else Page.Signup.route,
+            startDestination = if(authUIClient.getSignedInUser() != null) Pages.Menu() else Pages.Signup(),
             modifier = Modifier.padding(paddingVal)
         ) {
-            composable(Page.Menu.route){
+            composable<Pages.Menu>{
                 val user = authUIClient.getSignedInUser()
                 LaunchedEffect(Unit) {
                     if (user == null) {
@@ -77,10 +78,13 @@ fun App() {
                 MenuPage(
                     onSignOutClick = {
                         authUIClient.signOut()
+                    },
+                    onChatPageClick = {
+                        navController.navigate(Pages.Chat(""))
                     }
                 )
             }
-            composable(Page.Signup.route) {
+            composable<Pages.Signup> {
                 val signInViewModel = viewModel<SignInViewModel>()
                 val state by signInViewModel.state.collectAsState()
 
@@ -92,7 +96,7 @@ fun App() {
                             "Signin successful",
                             Toast.LENGTH_LONG
                         ).show()
-                        navController.navigate(Page.Menu.route)
+                        navController.navigate(Pages.Menu())
                         signInViewModel.resetState()
                     }
                 }
@@ -116,6 +120,9 @@ fun App() {
                     },
                     authUIClient
                 )
+            }
+            composable<Pages.Chat> {
+                ChatPage()
             }
         }
     }

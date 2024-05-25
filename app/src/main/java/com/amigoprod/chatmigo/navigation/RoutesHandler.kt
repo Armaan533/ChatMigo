@@ -2,92 +2,91 @@ package com.amigoprod.chatmigo.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.amigoprod.chatmigo.customAppBars.MenuPageBarFunc
-import java.util.Collections.emptyList
+import kotlinx.serialization.Serializable
 
-//data class NavPage(var name: String, var icon: ImageVector?, var route: String)
 
-//object Routes {
-//    val StartupPage = NavPage("Startup", null, "start")
-//    val MenuPage = NavPage("Menu", Icons.Outlined.Home, "menu")
-//}
-
-private object Routes {
-//    const val STARTUP_PAGE = "startup"
+private object Names {
     const val MENU_PAGE = "menu"
     const val SIGNUP_PAGE = "signup"
-    const val CHAT_PAGE = "chat/{${ArgParams.CHAT_ID}}"
+    const val CHAT_PAGE = "chat"
 }
 
-
-private object ArgParams {
-    const val CHAT_ID = "chatID"
-
-    fun toPath(param: String) = "{${param}}"
-}
-
-sealed class Page(
-    val route: String,
-    val isAppBarVisible: Boolean?,
-    val navArguments: List<NamedNavArgument> = emptyList(),
-    val pageBar: @Composable() () -> Unit
-) {
-
-
-    object Menu: Page(
-        route = Routes.MENU_PAGE,
+sealed class PageInfo(
+    val name: String,
+    val isAppBarVisible: Boolean,
+    val pageBar: @Composable (() -> Unit)
+){
+    data object Menu: PageInfo(
+        name = Names.MENU_PAGE,
         isAppBarVisible = true,
         pageBar = { MenuPageBarFunc() }
     )
 
-    object Signup: Page(
-        route = Routes.SIGNUP_PAGE,
-        isAppBarVisible = false,
+    data object Chat: PageInfo(
+        name = Names.CHAT_PAGE,
+        isAppBarVisible = true,
         pageBar = {}
     )
 
-
-    object Chat: Page(
-        Routes.CHAT_PAGE,
-        navArguments = listOf(navArgument(ArgParams.CHAT_ID) {
-            type = NavType.Companion.StringType
-        }),
-        isAppBarVisible = true,
+    data object Signup: PageInfo(
+        name = Names.SIGNUP_PAGE,
+        isAppBarVisible = false,
         pageBar = {}
-    ) {
-        fun createRoute(chatID: String) = Routes.CHAT_PAGE.replace(ArgParams.toPath(ArgParams.CHAT_ID), chatID)
-    }
+    )
+}
+@Serializable
+sealed class Pages(
+    val name: String = "",
+    val cID: String = ""
+){
+    @Serializable
+    class Menu: Pages(
+        name = Names.MENU_PAGE
+    )
+
+    @Serializable
+    class Chat(
+        val chatID: String
+    ): Pages(
+        name = Names.CHAT_PAGE,
+        cID = chatID
+    )
+
+    @Serializable
+    class Signup: Pages(
+        name = Names.SIGNUP_PAGE
+    )
 }
 
 
-fun getScreen(route: String?): Page? = Page::class.nestedClasses.map {
-        kClass -> kClass.objectInstance as Page
-}.firstOrNull { page -> page.route == route }
+fun getScreen(route: Pages): PageInfo? = PageInfo::class.nestedClasses.map {
+        kClass -> kClass.objectInstance as PageInfo
+}.firstOrNull { page -> page.name == route.name }
 
 
 class AppBarState(
     private val navController: NavController
 ) {
-    private val currentPageRoute: String?
+    private val currentPage: Pages?
         @Composable get() = navController
             .currentBackStackEntryAsState()
-            .value?.destination?.route
+            .value?.toRoute()
 
-    val currentPage: Page?
-        @Composable get() = getScreen(currentPageRoute)
+    private val currentPageInfo: PageInfo?
+        @Composable get() = currentPage?.let { getScreen(it) }
 
     val isVisible: Boolean
-        @Composable get() = currentPage?.isAppBarVisible == true
+        @Composable get() = currentPageInfo?.isAppBarVisible == true
 
-    val PageBar: @Composable() ()->Unit
-        @Composable get() = { currentPage?.pageBar?.let { it() } }
+    val pageBar: @Composable ()->Unit
+        @Composable get() = { currentPageInfo?.pageBar?.let { it() } }
 
 }
+
 
 @Composable
 fun rememberAppBarState(
