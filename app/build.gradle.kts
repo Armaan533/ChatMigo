@@ -71,6 +71,9 @@ dependencies {
     // dependency for firebase realtime database
     implementation("com.google.firebase:firebase-database")
 
+    // dependency for firebase firestore database
+    implementation("com.google.firebase:firebase-firestore")
+
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.8.0-beta01")
 

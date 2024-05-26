@@ -6,7 +6,7 @@ import java.sql.Timestamp
 
 
 data class Message(
-    val mid: String,
+//    val mid: String? = null,
     val content: String? = null,
     val senderId: String? = null,
     val timestamp: Timestamp? = null,
@@ -15,8 +15,8 @@ data class Message(
 )
 
 data class Chat(
-    val cid: String,
-    val lastMessage: Message?,
+    val cid: String? = null,
+    var lastMessage: Message? = null,
     val members: List<User>? = emptyList()
 )
 

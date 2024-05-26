@@ -41,7 +41,6 @@ sealed class PageInfo(
 @Serializable
 sealed class Pages(
     val name: String = "",
-    val cID: String = ""
 ){
     @Serializable
     class Menu: Pages(
@@ -52,8 +51,7 @@ sealed class Pages(
     class Chat(
         val chatID: String
     ): Pages(
-        name = Names.CHAT_PAGE,
-        cID = chatID
+        name = Names.CHAT_PAGE
     )
 
     @Serializable
