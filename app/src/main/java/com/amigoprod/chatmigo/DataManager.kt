@@ -1,7 +1,9 @@
 package com.amigoprod.chatmigo
 
-import android.app.Application
 import androidx.lifecycle.SavedStateHandle
+import com.amigoprod.chatmigo.model.Chat
+import com.amigoprod.chatmigo.model.Message
+import com.amigoprod.chatmigo.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import com.google.firebase.firestore.firestore

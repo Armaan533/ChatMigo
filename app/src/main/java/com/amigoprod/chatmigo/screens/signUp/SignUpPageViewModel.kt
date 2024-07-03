@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.ui.models
+package com.amigoprod.chatmigo.screens.signUp
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

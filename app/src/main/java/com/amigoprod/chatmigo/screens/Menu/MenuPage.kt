@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.ui.pages
+package com.amigoprod.chatmigo.screens.Menu
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

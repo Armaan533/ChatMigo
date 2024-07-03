@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.ui.pages
+package com.amigoprod.chatmigo.screens.signUp
 
 import android.app.Activity
 import android.util.Log
@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.ui.models.AuthUIClient
-import com.amigoprod.chatmigo.ui.models.SignUpPageViewModel
 import kotlinx.coroutines.launch
 
 
@@ -135,7 +134,6 @@ fun SignUp(
                 onClick = {
                     pageModel.resetKey("inputEn", false)
                     pageModel.resetKey("buttonEn", false)
-//                    isOtpSent.value = onOtpGenClick("+91${phoneNumber.value}", context)
                     Log.d("phn", phone.value.text)
                     authUIClient.sendVerificationCode(
                         "+91${phone.value.text}",

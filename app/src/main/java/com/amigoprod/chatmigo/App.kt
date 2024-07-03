@@ -21,13 +21,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.amigoprod.chatmigo.navigation.Pages
+import com.amigoprod.chatmigo.model.Pages
 import com.amigoprod.chatmigo.ui.models.AuthUIClient
 import com.amigoprod.chatmigo.ui.models.SignInViewModel
 import com.amigoprod.chatmigo.navigation.rememberAppBarState
-import com.amigoprod.chatmigo.ui.pages.ChatPage
-import com.amigoprod.chatmigo.ui.pages.MenuPage
-import com.amigoprod.chatmigo.ui.pages.SignUp
+import com.amigoprod.chatmigo.screens.Chat.ChatPage
+import com.amigoprod.chatmigo.screens.Menu.MenuPage
+import com.amigoprod.chatmigo.screens.signUp.SignUp
 
 @Composable
 fun App() {

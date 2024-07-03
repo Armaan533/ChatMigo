@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.amigoprod.chatmigo.SignInResult
-import com.amigoprod.chatmigo.User
+import com.amigoprod.chatmigo.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential

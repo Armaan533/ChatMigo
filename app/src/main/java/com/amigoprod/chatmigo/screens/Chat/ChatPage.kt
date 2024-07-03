@@ -1,4 +1,4 @@
-package com.amigoprod.chatmigo.ui.pages
+package com.amigoprod.chatmigo.screens.Chat
 
 
 import androidx.compose.foundation.background
