@@ -1,10 +1,8 @@
-package com.amigoprod.chatmigo.ui.models
+package com.amigoprod.chatmigo
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.amigoprod.chatmigo.SignInResult
-import com.amigoprod.chatmigo.SignInState
 
 
 class SignInViewModel(

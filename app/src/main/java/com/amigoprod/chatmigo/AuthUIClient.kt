@@ -1,10 +1,9 @@
-package com.amigoprod.chatmigo.ui.models
+package com.amigoprod.chatmigo
 
 import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.amigoprod.chatmigo.SignInResult
 import com.amigoprod.chatmigo.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException

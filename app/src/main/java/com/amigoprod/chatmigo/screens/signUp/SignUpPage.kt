@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amigoprod.chatmigo.SignInResult
-import com.amigoprod.chatmigo.ui.models.AuthUIClient
+import com.amigoprod.chatmigo.AuthUIClient
 import kotlinx.coroutines.launch
 
 
